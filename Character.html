@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Character Generator</title>
+    <style>
+        body {
+            background-color: #1a2639; /* Dark Navy */
+            color: #f4e4bc; /* Parchment */
+            font-family: 'Georgia', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 {
+            color: #d4af37; /* Gold */
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: #f4e4bc;
+            color: #1a2639;
+            border: 4px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            position: relative;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .card-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #5c6b7f;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .card-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        /* Specific colors for card types to match your design */
+        .card.identity { border-color: #d4af37; } /* Gold */
+        .card.strength { border-color: #2e8b57; } /* Greenish/Gold */
+        .card.struggle { border-color: #b22222; } /* Red/Dark */
+
+        .gen-btn {
+            background-color: #d4af37;
+            color: #1a2639;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+
+        .gen-btn:active {
+            transform: scale(0.95);
+            background-color: #c4a030;
+        }
+
+        /* Animation class */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Who are you?</h1>
+
+    <div class="card-container">
+        <div class="card identity">
+            <div class="card-label">I am a...</div>
+            <div class="card-value" id="identityResult">?</div>
+        </div>
+
+        <div class="card strength">
+            <div class="card-label">My Strength is...</div>
+            <div class="card-value" id="strengthResult">?</div>
+        </div>
+
+        <div class="card struggle">
+            <div class="card-label">But I struggle with...</div>
+            <div class="card-value" id="struggleResult">?</div>
+        </div>
+    </div>
+
+    <button class="gen-btn" onclick="generateCharacter()">Create Character</button>
+
+    <script>
+        // Data extracted from Character Cards.pdf
+        const strengths = [
+            "Creativity", "Bravery", "Curiosity", "Judgment", "Learning", 
+            "Perspective", "Perseverance", "Honesty", "Caring", "Empathy", 
+            "Forgiveness", "Gratitude", "Humility", "Optimism", "Authenticity", 
+            "Teamwork", "Caution", "Zest", "Fairness", "Wisdom", "Kindness", 
+            "Leadership", "Self-Control", "Humor", "Spirituality", "Appreciation", "Structured"
+        ];
+
+        // Data extracted from Character Cards.pdf
+        const struggles = [
+            "Closed-Minded", "Meddler", "Reckless", "Stubborn", "Critical", 
+            "Obsessive", "Defensive", "Too Chill", "Clingy", "People-Pleaser", 
+            "Perfectionist", "Judgmental", "Controlling", "Fearful", "Independent", 
+            "Competitive", "Sabotaging", "Needy", "Jealous", "Offended", 
+            "Resentful", "Overconfident", "Apathetic", "Suspicious"
+        ];
+
+        // Large bank of 150+ random identities
+        const identities = [
+            // Fantasy / Classic
+            "Elf Ranger", "Grumpy Wizard", "Lost Prince", "Retired Pirate", "Knight", "Goblin Cook",
+            "Fairy Godmother", "Dragon Hatchling", "Witch's Cat", "Royal Guard", "Bard", "Skeleton",
+            "Ghost", "Vampire Dentist", "Werewolf", "Mermaid", "Tree Spirit", "Gnome", "Troll Bridge-Keeper",
+            "King", "Queen", "Jester", "Executioner", "Sorcerer", "Druid", "Talking Sword",
+            
+            // Animals / Creatures
+            "Ladybug", "Anxious Squirrel", "Bear Cub", "Stray Dog", "Wise Owl", "Frog", "Toad",
+            "Hamster", "Lion", "Tiger", "Elephant", "Mouse", "Badger", "Fox", "Crow", "Octopus",
+            "Penguin", "Sloth", "Raccoon", "Opossum", "Pigeon", "Seagull", "Goldfish", "Shark",
+            "Butterfly", "Spider", "Snail", "Turtle", "Rabbit", "Wolf", "Horse", "Pony",
+            
+            // Occupations (Ordinary & Odd)
+            "Merchant", "Baker", "Blacksmith", "Librarian", "Gardener", "Teacher", "Doctor",
+            "Clockmaker", "Toymaker", "Fisherman", "Farmer", "Miner", "Soldier", "Spy",
+            "Thief", "Detective", "Artist", "Musician", "Dancer", "Chef", "Waiter", "Cleaner",
+            "Chimney Sweep", "Butler", "Maid", "Nanny", "Postman", "Scientist", "Inventor",
+            
+            // Whimsical / Objects
+            "Talking Teapot", "Sentient Robot", "Living Doll", "Scarecrow", "Snowman", "Cloud",
+            "Shadow", "Reflection", "Painting", "Statue", "Robot Vacuum", "Toaster", "Lamp",
+            "Old Book", "Magic Carpet", "Broomstick", "Mirror", "Teddy Bear", "Lego Man",
+            
+            // Archetypes
+            "Orphan", "Wanderer", "Chosen One", "Villain", "Sidekick", "Mentor", "Twin",
+            "Time Traveler", "Alien", "Astronaut", "Cowboy", "Ninja", "Samurai", "Viking",
+            "Explorer", "Archaeologist", "Zookeeper", "Circus Performer", "Magician",
+            
+            // Specific & Silly
+            "Professional Sleeper", "Cheese Taster", "Dragon Slayer (In Training)", "Failed Wizard",
+            "Talking Mushroom", "Invisible Friend", "Monster Hunter", "Space Pirate",
+            "Candy Maker", "Balloon Salesman", "Puppeteer", "Mime", "Clown"
+        ];
+
+        function generateCharacter() {
+            // Get random items
+            const rIdentity = identities[Math.floor(Math.random() * identities.length)];
+            const rStrength = strengths[Math.floor(Math.random() * strengths.length)];
+            const rStruggle = struggles[Math.floor(Math.random() * struggles.length)];
+
+            // Update DOM
+            const idEl = document.getElementById('identityResult');
+            const strEl = document.getElementById('strengthResult');
+            const struglEl = document.getElementById('struggleResult');
+
+            idEl.innerText = rIdentity;
+            strEl.innerText = rStrength;
+            struglEl.innerText = rStruggle;
+
+            // Trigger Animation
+            resetAnimation(idEl);
+            resetAnimation(strEl);
+            resetAnimation(struglEl);
+        }
+
+        function resetAnimation(element) {
+            // Removing and re-adding the class triggers the CSS animation again
+            element.parentElement.classList.remove('fade-in');
+            void element.parentElement.offsetWidth; // trigger reflow
+            element.parentElement.classList.add('fade-in');
+        }
+
+        // Generate one on load so it's not empty
+        generateCharacter();
+
+    </script>
+</body>
+</html>
