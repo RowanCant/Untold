@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Story Compass</title>
     <style>
         body {
-            background-color: #1a2639; /* Dark Navy from your card backs */
-            color: #f4e4bc; /* Parchment/Gold */
+            background-color: #1a2639; /* Dark Navy */
+            color: #f4e4bc; /* Parchment */
             font-family: 'Georgia', serif;
             display: flex;
             flex-direction: column;
@@ -17,6 +17,7 @@
             margin: 0;
             overflow: hidden;
             text-align: center;
+            -webkit-tap-highlight-color: transparent;
         }
 
         h1 {
@@ -24,87 +25,93 @@
             margin-bottom: 20px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: #d4af37; /* Gold Leaf */
+            color: #d4af37;
         }
 
         .category-selector {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
             margin-bottom: 30px;
+            width: 90%;
         }
 
         .cat-btn {
             background: transparent;
             border: 2px solid #5c6b7f;
             color: #a0b0c5;
-            padding: 10px 15px;
+            padding: 10px 12px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            outline: none;
         }
 
         .cat-btn.active {
             border-color: #d4af37;
-            color: #d4af37;
-            background: rgba(212, 175, 55, 0.1);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            color: #1a2639;
+            background-color: #d4af37;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
         }
 
         .compass-container {
             position: relative;
-            width: 280px;
-            height: 280px;
+            width: 260px;
+            height: 260px;
             border: 8px solid #d4af37;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             background: radial-gradient(circle, #2c3e50 0%, #1a2639 100%);
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             margin-bottom: 40px;
         }
 
-        /* Decorative Inner Ring */
+        /* Decorative Ring */
         .compass-container::before {
             content: '';
             position: absolute;
-            width: 240px;
-            height: 240px;
+            width: 230px;
+            height: 230px;
             border: 2px dashed #5c6b7f;
             border-radius: 50%;
             animation: spin-slow 20s linear infinite;
         }
 
         .result-text {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #fff;
             z-index: 10;
             max-width: 80%;
             word-wrap: break-word;
-            min-height: 3rem;
+            min-height: 2.5rem;
+            line-height: 1.2;
         }
 
         .spin-btn {
             background-color: #d4af37;
             color: #1a2639;
             border: none;
-            padding: 15px 50px;
-            font-size: 1.2rem;
+            padding: 15px 60px;
+            font-size: 1.3rem;
             font-weight: bold;
-            border-radius: 5px;
+            border-radius: 50px;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 2px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             transition: transform 0.1s;
+            -webkit-appearance: none; /* Fix for iOS buttons */
         }
 
         .spin-btn:active {
             transform: scale(0.95);
+            background-color: #c4a030;
         }
 
         @keyframes spin-slow {
@@ -113,37 +120,36 @@
         }
 
         .flash {
-            animation: flash-anim 0.5s;
+            animation: flash-anim 0.4s ease-out;
         }
 
         @keyframes flash-anim {
-            0% { opacity: 0.2; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.1); }
+            0% { opacity: 0.2; transform: scale(0.8); color: #d4af37; }
+            50% { opacity: 1; transform: scale(1.1); color: #fff; }
             100% { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-    <h1>Story Compass</h1>
+    <h1>The Story Compass</h1>
 
     <div class="category-selector">
-        <button class="cat-btn active" onclick="setCategory('adventureNoun')">Adventure Noun</button>
-        <button class="cat-btn" onclick="setCategory('funNoun')">Fun Noun</button>
-        <button class="cat-btn" onclick="setCategory('action')">Action (Verb)</button>
-        <button class="cat-btn" onclick="setCategory('adj')">Description</button>
+        <button class="cat-btn active" onclick="setCategory('adventureNoun', this)">Adventure</button>
+        <button class="cat-btn" onclick="setCategory('funNoun', this)">Fun Noun</button>
+        <button class="cat-btn" onclick="setCategory('action', this)">Action</button>
+        <button class="cat-btn" onclick="setCategory('adj', this)">Describe</button>
     </div>
 
     <div class="compass-container">
-        <div class="result-text" id="result">...</div>
+        <div class="result-text" id="result">Ready?</div>
     </div>
 
     <button class="spin-btn" onclick="spin()">SPIN</button>
 
     <script>
-        // Data extracted directly from Spinners.pdf
+        [cite_start]// Data from Spinners.pdf [cite: 27, 28, 29]
         const data = {
-            [span_0](start_span)// Sources:[span_0](end_span)
             adventureNoun: [
                 "RUMOUR", "LANTERN", "PATH", "STORM", "ECHO", "KINGDOM", "QUEST", "FEATHER", 
                 "SECRET", "BRIDGE", "ISLE", "RIFT", "SHADOW", "MEMORY", "GATE", "TRAIL", 
@@ -152,7 +158,6 @@
                 "MOUNTAIN", "TOWER", "SCROLL", "PACT", "SIGNAL", "BURROW", "PASSAGE", "SMILE", 
                 "CHALLENGE", "FRIEND", "CREATURE", "DREAM", "ARTIFACT", "STRANGER", "MYSTERY", "GUEST"
             ],
-            [span_1](start_span)// Sources:[span_1](end_span)
             funNoun: [
                 "PANCAKE", "WHISKER", "FART", "PIPSQUEAK", "CRUMB", "BUBBLE", "SCONE", "SPROUT", 
                 "MOP", "PEBBLE", "SAUSAGE", "SCRIBBLE", "LUNCH", "TEACUP", "WAFFLE", "PUDDLE", 
@@ -161,7 +166,6 @@
                 "BUMBLE", "MUFFIN", "SNAIL", "CUPCAKE", "TROUSERS", "BISCUIT", "SPROCKET", "HAMSTER", 
                 "TURNIP", "CHUCKLE", "SNEEZE"
             ],
-            [span_2](start_span)// Sources:[span_2](end_span)
             action: [
                 "CLIMB", "FALL", "RETURN", "APPROACH", "ASK", "TELL", "WARN", "REFUSE", "INVITE", 
                 "OFFER", "AGREE", "SILENT", "DOUBT", "CHALLENGE", "PROMISE", "DECIDE", "FORGET", 
@@ -170,7 +174,6 @@
                 "PUSH", "LIFT", "CARRY", "SUMMON", "PONDER", "MERGE", "CREATE", "REVEAL", "HIDE", 
                 "CHANGE", "REALISE", "OBSERVE", "TRUST"
             ],
-            [span_3](start_span)// Sources:[span_3](end_span)
             adj: [
                 "SOGGY", "BOUNCY", "YAWNING", "ZIPPY", "SNICKERING", "UNRULY", "DIZZY", "CHATTY", 
                 "CLUMSY", "PUZZLED", "GIGGLY", "SKITTERING", "TUMBLEDOWN", "SQUEAKY", "GOBSMACKED", 
@@ -186,45 +189,62 @@
         };
 
         let currentCategory = 'adventureNoun';
+        let isSpinning = false;
 
-        function setCategory(cat) {
+        function setCategory(cat, btnElement) {
+            // Update the tracker variable
             currentCategory = cat;
-            // Update UI buttons
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
             
-            // Clear result
-            document.getElementById('result').innerText = "...";
-            document.getElementById('result').style.opacity = "0.5";
+            // Visual Update: Remove 'active' from all buttons
+            const allButtons = document.querySelectorAll('.cat-btn');
+            allButtons.forEach(b => b.classList.remove('active'));
+            
+            // Add 'active' to the clicked button
+            btnElement.classList.add('active');
+            
+            // Reset the text
+            const resultElement = document.getElementById('result');
+            resultElement.innerText = "Ready?";
+            resultElement.style.opacity = "0.5";
         }
 
         function spin() {
+            if (isSpinning) return; // Prevent double clicking
+            isSpinning = true;
+
             const list = data[currentCategory];
             const resultElement = document.getElementById('result');
+            resultElement.style.opacity = "1";
             
-            // Simple animation loop
+            // Animation loop
             let counter = 0;
+            const totalSpins = 15; // How many words flash before stopping
+            
             const interval = setInterval(() => {
+                // Pick a random word just for the visual effect
                 const randomTemp = list[Math.floor(Math.random() * list.length)];
                 resultElement.innerText = randomTemp;
+                
                 counter++;
-                if (counter > 10) {
+                if (counter > totalSpins) {
                     clearInterval(interval);
-                    finalizeSpin();
+                    finalizeSpin(list);
                 }
-            }, 50);
+            }, 60); // Speed of the flicker (milliseconds)
         }
 
-        function finalizeSpin() {
-            const list = data[currentCategory];
+        function finalizeSpin(list) {
             const finalWord = list[Math.floor(Math.random() * list.length)];
             const resultElement = document.getElementById('result');
             
             resultElement.innerText = finalWord;
+            
+            // Trigger the "Flash" animation
             resultElement.classList.remove('flash');
-            void resultElement.offsetWidth; // trigger reflow
+            void resultElement.offsetWidth; // This hack forces the animation to restart
             resultElement.classList.add('flash');
-            resultElement.style.opacity = "1";
+            
+            isSpinning = false;
         }
     </script>
 </body>
