@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Story Compass</title>
+    <style>
+        body {
+            background-color: #1a2639; /* Dark Navy */
+            color: #f4e4bc; /* Parchment */
+            font-family: 'Georgia', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #d4af37;
+        }
+
+        /* Updated container to fit more buttons */
+        .category-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            margin-bottom: 25px;
+            width: 95%;
+            max-width: 400px;
+        }
+
+        .cat-btn {
+            background: transparent;
+            border: 1px solid #5c6b7f;
+            color: #a0b0c5;
+            padding: 8px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            outline: none;
+            flex-grow: 1; /* Makes buttons fill the space */
+        }
+
+        .cat-btn.active {
+            border-color: #d4af37;
+            color: #1a2639;
+            background-color: #d4af37;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+        }
+
+        .compass-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            border: 6px solid #d4af37;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, #2c3e50 0%, #1a2639 100%);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+        }
+
+        .compass-container::before {
+            content: '';
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border: 2px dashed #5c6b7f;
+            border-radius: 50%;
+            animation: spin-slow 20s linear infinite;
+        }
+
+        .result-text {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #fff;
+            z-index: 10;
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.2;
+            text-transform: capitalize;
+        }
+
+        .spin-btn {
+            background-color: #d4af37;
+            color: #1a2639;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+            -webkit-appearance: none;
+            margin-bottom: 20px;
+        }
+
+        .spin-btn:active {
+            transform: scale(0.95);
+            background-color: #c4a030;
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .flash {
+            animation: flash-anim 0.4s ease-out;
+        }
+
+        @keyframes flash-anim {
+            0% { opacity: 0.2; transform: scale(0.8); color: #d4af37; }
+            50% { opacity: 1; transform: scale(1.1); color: #fff; }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>The Story Compass</h1>
+
+    <div class="category-selector">
+        <button class="cat-btn active" onclick="setCategory('adventureNoun', this)">Adventure</button>
+        <button class="cat-btn" onclick="setCategory('funNoun', this)">Fun Noun</button>
+        <button class="cat-btn" onclick="setCategory('action', this)">Action</button>
+        <button class="cat-btn" onclick="setCategory('sounds', this)">Sound/Move</button>
+        <button class="cat-btn" onclick="setCategory('adj', this)">Describe</button>
+        <button class="cat-btn" onclick="setCategory('emotion', this)">Emotion</button>
+    </div>
+
+    <div class="compass-container">
+        <div class="result-text" id="result">Ready?</div>
+    </div>
+
+    <button class="spin-btn" onclick="spin()">SPIN</button>
+
+    <script>
+        const data = {
+            // Source: Spinners.pdf Page 2
+            adventureNoun: [
+                "RUMOUR", "LANTERN", "PATH", "STORM", "ECHO", "KINGDOM", "QUEST", "FEATHER", 
+                "SECRET", "BRIDGE", "ISLE", "RIFT", "SHADOW", "MEMORY", "GATE", "TRAIL", 
+                "SANCTUARY", "STONE", "DAWN", "MAP", "TIDE", "GARDEN", "WHISPER", "WORLD", 
+                "COMPASS", "LAKE", "LETTER", "FOREST", "SOUND", "LIGHT", "PORTAL", "PUZZLE", 
+                "MOUNTAIN", "TOWER", "SCROLL", "PACT", "SIGNAL", "BURROW", "PASSAGE", "SMILE", 
+                "CHALLENGE", "FRIEND", "CREATURE", "DREAM", "ARTIFACT", "STRANGER", "MYSTERY", "GUEST"
+            ],
+            // Source: Spinners.pdf Page 2
+            funNoun: [
+                "PANCAKE", "WHISKER", "FART", "PIPSQUEAK", "CRUMB", "BUBBLE", "SCONE", "SPROUT", 
+                "MOP", "PEBBLE", "SAUSAGE", "SCRIBBLE", "LUNCH", "TEACUP", "WAFFLE", "PUDDLE", 
+                "SANDWICH", "HUG", "BUTTON", "TOADSTOOL", "ACORN", "PICKLE", "UNDIES", "VOMIT", 
+                "NOODLE", "MARSHMALLOW", "TEACHER", "DUCKLING", "FAIRY", "TEAPOT", "SOCK", "PUPPY", 
+                "BUMBLE", "MUFFIN", "SNAIL", "CUPCAKE", "TROUSERS", "BISCUIT", "SPROCKET", "HAMSTER", 
+                "TURNIP", "CHUCKLE", "SNEEZE"
+            ],
+            // Source: Spinners.pdf Page 1
+            action: [
+                "CLIMB", "FALL", "RETURN", "APPROACH", "ASK", "TELL", "WARN", "REFUSE", "INVITE", 
+                "OFFER", "AGREE", "SILENT", "DOUBT", "CHALLENGE", "PROMISE", "DECIDE", "FORGET", 
+                "CROSS", "WANDER", "IMAGINE", "REMEMBER", "ESCAPE", "RESTLESS", "CHASE", "HOPE", 
+                "LEAD", "FEAR", "FOLLOW", "TURN", "CLOSE", "OPEN", "TWIST", "PULL", "DROP", 
+                "PUSH", "LIFT", "CARRY", "SUMMON", "PONDER", "MERGE", "CREATE", "REVEAL", "HIDE", 
+                "CHANGE", "REALISE", "OBSERVE", "TRUST"
+            ],
+            // Source: Spinners.pdf Page 1 (The swoopy words!)
+            sounds: [
+                "DRIBBLE", "CLATTER", "FLUTTER", "GUZZLE", "POUNCE", "SMOOSHY", "SKITTER", "SWOOP",
+                "PLOP", "GOBBLE", "WIGGLE", "JIGGLE", "BOING", "FIZZ", "SPUTTER", "WOBBLE", "CHUCK",
+                "CLING", "SHUFFLE", "HICCUP", "PUFF", "SWIRL", "WADDLE", "SNIFFLE", "ZAP", "FLOP",
+                "SQUEAK", "PLONK", "TUMBLE", "NOODLE", "SCOOT", "LAUGH", "SLIDE", "JOSTLE", "DANCE",
+                "YELL", "HAGGLE", "CHAT", "HUSTLE", "SKIP", "FART", "YAWN", "SQUELCH", "RUMBLE", "NUDGE"
+            ],
+            // Source: Spinners.pdf Page 3
+            adj: [
+                "SOGGY", "BOUNCY", "YAWNING", "ZIPPY", "SNICKERING", "UNRULY", "DIZZY", "CHATTY", 
+                "CLUMSY", "PUZZLED", "GIGGLY", "SKITTERING", "TUMBLEDOWN", "SQUEAKY", "GOBSMACKED", 
+                "PLUCKY", "SPICY", "QUIRKY", "RAMBUNCTIOUS", "WHIFFLED", "KOOKY", "RUMBLING", "GOOFY", 
+                "SNAZZY", "FLUSTERED", "TICKLISH", "PICKLED", "MISCHIEVOUS", "CRANKY", "LOPSIDED", 
+                "GRUMBLING", "SPARKLY", "WONKY", "BAFFLED", "SNEEZING", "WOBBLY", "CHUNKY", 
+                "INCREDIBLE", "WONDEROUS", "UNCOMFORTABLE", "STINKY", "IMAGINED", "IMPOSSIBLE", 
+                "SHY", "SMOOSHY", "BEDRAGGLED", "PUGGISH", "CHEEKY", "HOLLOW", "CRIMSON", "GLACIAL", 
+                "WANDERING", "STAR-TOUCHED", "ECHOING", "SECRET", "STORM-BOUND", "GLIMMERING", 
+                "STRAYING", "CLEVER", "BLOOMING", "STRANDED", "DISTANT", "GOLDEN", "SILENT", 
+                "SHADOW", "CRUEL", "TIMELESS", "MOONLIT", "RISING", "BROKEN", "RELUCTANT"
+            ],
+            // Source: Spinners.pdf Page 4
+            emotion: [
+                "JEALOUS", "DISTANT", "REMORSEFUL", "STUPID", "INFERIOR", "ISOLATED", "APATHETIC",
+                "SLEEPY", "RELAXED", "PENSIVE", "RESPONSIVE", "SERENE", "SARCASTIC", "HURT", "GUILTY",
+                "ASHAMED", "DEPRESSED", "LONELY", "BORED", "TIRED", "FRUSTRATED", "HOSTILE", "ANGRY",
+                "SAD", "PEACEFUL", "CONTENT", "THOUGHTFUL", "INTIMATE", "LOVING", "TRUSTING", "SECURE",
+                "THANKFUL", "NURTURING", "CONFIDENT", "FAITHFUL", "DISCERNING", "IMPORTANT", "POWERFUL",
+                "APPRECIATED", "VALUABLE", "MAD", "SCARED", "HATEFUL", "SELFISH", "CRITICAL", "CONFUSED",
+                "REJECTED", "HELPLESS", "SUBMISSIVE", "INSECURE", "ANXIOUS", "EXCITED", "DARING",
+                "OPTIMISTIC", "AWARE", "SURPRISED", "PROUD", "RESPECTED", "WORTHWHILE", "SUCCESSFUL",
+                "SENSUOUS", "ENERGETIC", "CHEERFUL", "CREATIVE", "HOPEFUL", "PLAYFUL", "STIMULATING",
+                "AMUSED", "FASCINATING", "IRRITATED", "SKEPTICAL", "BEWILDERED", "DISCOURAGED",
+                "INSIGNIFICANT", "INADEQUATE", "EMBARRASSED", "OVERWHELMED"
+            ]
+        };
+
+        let currentCategory = 'adventureNoun';
+        let isSpinning = false;
+
+        function setCategory(cat, btnElement) {
+            currentCategory = cat;
+            const allButtons = document.querySelectorAll('.cat-btn');
+            allButtons.forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            const resultElement = document.getElementById('result');
+            resultElement.innerText = "Ready?";
+            resultElement.style.opacity = "0.5";
+        }
+
+        function spin() {
+            if (isSpinning) return;
+            isSpinning = true;
+
+            const list = data[currentCategory];
+            const resultElement = document.getElementById('result');
+            resultElement.style.opacity = "1";
+            
+            let counter = 0;
+            const totalSpins = 12;
+            
+            const interval = setInterval(() => {
+                const randomTemp = list[Math.floor(Math.random() * list.length)];
+                resultElement.innerText = randomTemp;
+                counter++;
+                if (counter > totalSpins) {
+                    clearInterval(interval);
+                    finalizeSpin(list);
+                }
+            }, 60);
+        }
+
+        function finalizeSpin(list) {
+            const finalWord = list[Math.floor(Math.random() * list.length)];
+            const resultElement = document.getElementById('result');
+            resultElement.innerText = finalWord;
+            resultElement.classList.remove('flash');
+            void resultElement.offsetWidth;
+            resultElement.classList.add('flash');
+            isSpinning = false;
+        }
+    </script>
+</body>
+</html>
