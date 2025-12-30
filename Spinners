@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Story Compass</title>
+    <style>
+        body {
+            background-color: #1a2639; /* Dark Navy from your card backs */
+            color: #f4e4bc; /* Parchment/Gold */
+            font-family: 'Georgia', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #d4af37; /* Gold Leaf */
+        }
+
+        .category-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .cat-btn {
+            background: transparent;
+            border: 2px solid #5c6b7f;
+            color: #a0b0c5;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .cat-btn.active {
+            border-color: #d4af37;
+            color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .compass-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            border: 8px solid #d4af37;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, #2c3e50 0%, #1a2639 100%);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            margin-bottom: 40px;
+        }
+
+        /* Decorative Inner Ring */
+        .compass-container::before {
+            content: '';
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            border: 2px dashed #5c6b7f;
+            border-radius: 50%;
+            animation: spin-slow 20s linear infinite;
+        }
+
+        .result-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+            z-index: 10;
+            max-width: 80%;
+            word-wrap: break-word;
+            min-height: 3rem;
+        }
+
+        .spin-btn {
+            background-color: #d4af37;
+            color: #1a2639;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+
+        .spin-btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .flash {
+            animation: flash-anim 0.5s;
+        }
+
+        @keyframes flash-anim {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Story Compass</h1>
+
+    <div class="category-selector">
+        <button class="cat-btn active" onclick="setCategory('adventureNoun')">Adventure Noun</button>
+        <button class="cat-btn" onclick="setCategory('funNoun')">Fun Noun</button>
+        <button class="cat-btn" onclick="setCategory('action')">Action (Verb)</button>
+        <button class="cat-btn" onclick="setCategory('adj')">Description</button>
+    </div>
+
+    <div class="compass-container">
+        <div class="result-text" id="result">...</div>
+    </div>
+
+    <button class="spin-btn" onclick="spin()">SPIN</button>
+
+    <script>
+        // Data extracted directly from Spinners.pdf
+        const data = {
+            [span_0](start_span)// Sources:[span_0](end_span)
+            adventureNoun: [
+                "RUMOUR", "LANTERN", "PATH", "STORM", "ECHO", "KINGDOM", "QUEST", "FEATHER", 
+                "SECRET", "BRIDGE", "ISLE", "RIFT", "SHADOW", "MEMORY", "GATE", "TRAIL", 
+                "SANCTUARY", "STONE", "DAWN", "MAP", "TIDE", "GARDEN", "WHISPER", "WORLD", 
+                "COMPASS", "LAKE", "LETTER", "FOREST", "SOUND", "LIGHT", "PORTAL", "PUZZLE", 
+                "MOUNTAIN", "TOWER", "SCROLL", "PACT", "SIGNAL", "BURROW", "PASSAGE", "SMILE", 
+                "CHALLENGE", "FRIEND", "CREATURE", "DREAM", "ARTIFACT", "STRANGER", "MYSTERY", "GUEST"
+            ],
+            [span_1](start_span)// Sources:[span_1](end_span)
+            funNoun: [
+                "PANCAKE", "WHISKER", "FART", "PIPSQUEAK", "CRUMB", "BUBBLE", "SCONE", "SPROUT", 
+                "MOP", "PEBBLE", "SAUSAGE", "SCRIBBLE", "LUNCH", "TEACUP", "WAFFLE", "PUDDLE", 
+                "SANDWICH", "HUG", "BUTTON", "TOADSTOOL", "ACORN", "PICKLE", "UNDIES", "VOMIT", 
+                "NOODLE", "MARSHMALLOW", "TEACHER", "DUCKLING", "FAIRY", "TEAPOT", "SOCK", "PUPPY", 
+                "BUMBLE", "MUFFIN", "SNAIL", "CUPCAKE", "TROUSERS", "BISCUIT", "SPROCKET", "HAMSTER", 
+                "TURNIP", "CHUCKLE", "SNEEZE"
+            ],
+            [span_2](start_span)// Sources:[span_2](end_span)
+            action: [
+                "CLIMB", "FALL", "RETURN", "APPROACH", "ASK", "TELL", "WARN", "REFUSE", "INVITE", 
+                "OFFER", "AGREE", "SILENT", "DOUBT", "CHALLENGE", "PROMISE", "DECIDE", "FORGET", 
+                "CROSS", "WANDER", "IMAGINE", "REMEMBER", "ESCAPE", "RESTLESS", "CHASE", "HOPE", 
+                "LEAD", "FEAR", "FOLLOW", "TURN", "CLOSE", "OPEN", "TWIST", "PULL", "DROP", 
+                "PUSH", "LIFT", "CARRY", "SUMMON", "PONDER", "MERGE", "CREATE", "REVEAL", "HIDE", 
+                "CHANGE", "REALISE", "OBSERVE", "TRUST"
+            ],
+            [span_3](start_span)// Sources:[span_3](end_span)
+            adj: [
+                "SOGGY", "BOUNCY", "YAWNING", "ZIPPY", "SNICKERING", "UNRULY", "DIZZY", "CHATTY", 
+                "CLUMSY", "PUZZLED", "GIGGLY", "SKITTERING", "TUMBLEDOWN", "SQUEAKY", "GOBSMACKED", 
+                "PLUCKY", "SPICY", "QUIRKY", "RAMBUNCTIOUS", "WHIFFLED", "KOOKY", "RUMBLING", "GOOFY", 
+                "SNAZZY", "FLUSTERED", "TICKLISH", "PICKLED", "MISCHIEVOUS", "CRANKY", "LOPSIDED", 
+                "GRUMBLING", "SPARKLY", "WONKY", "BAFFLED", "SNEEZING", "WOBBLY", "CHUNKY", 
+                "INCREDIBLE", "WONDEROUS", "UNCOMFORTABLE", "STINKY", "IMAGINED", "IMPOSSIBLE", 
+                "SHY", "SMOOSHY", "BEDRAGGLED", "PUGGISH", "CHEEKY", "HOLLOW", "CRIMSON", "GLACIAL", 
+                "WANDERING", "STAR-TOUCHED", "ECHOING", "SECRET", "STORM-BOUND", "GLIMMERING", 
+                "STRAYING", "CLEVER", "BLOOMING", "STRANDED", "DISTANT", "GOLDEN", "SILENT", 
+                "SHADOW", "CRUEL", "TIMELESS", "MOONLIT", "RISING", "BROKEN", "RELUCTANT"
+            ]
+        };
+
+        let currentCategory = 'adventureNoun';
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            // Update UI buttons
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Clear result
+            document.getElementById('result').innerText = "...";
+            document.getElementById('result').style.opacity = "0.5";
+        }
+
+        function spin() {
+            const list = data[currentCategory];
+            const resultElement = document.getElementById('result');
+            
+            // Simple animation loop
+            let counter = 0;
+            const interval = setInterval(() => {
+                const randomTemp = list[Math.floor(Math.random() * list.length)];
+                resultElement.innerText = randomTemp;
+                counter++;
+                if (counter > 10) {
+                    clearInterval(interval);
+                    finalizeSpin();
+                }
+            }, 50);
+        }
+
+        function finalizeSpin() {
+            const list = data[currentCategory];
+            const finalWord = list[Math.floor(Math.random() * list.length)];
+            const resultElement = document.getElementById('result');
+            
+            resultElement.innerText = finalWord;
+            resultElement.classList.remove('flash');
+            void resultElement.offsetWidth; // trigger reflow
+            resultElement.classList.add('flash');
+            resultElement.style.opacity = "1";
+        }
+    </script>
+</body>
+</html>
